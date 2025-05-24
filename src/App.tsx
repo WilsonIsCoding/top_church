@@ -8,14 +8,14 @@ function App() {
   // 選擇狀態
   const [selectedArea, setSelectedArea] = useState("");
   const [selectedGroup, setSelectedGroup] = useState("");
-  const [selectedNames, setSelectedNames] = useState([]);
+  const [selectedNames, setSelectedNames] = useState<string[]>([]);
 
   // 表單輸入資料
-  const [formName, setFormName] = useState("");
+  const formName = "1189回報表";
   const [formMessage, setFormMessage] = useState("");
-  const [formUrl, setFormUrl] = useState(
-    "https://script.google.com/macros/s/AKfycbwGM6Trj8cpHEI2vkWc2sJ9hiAas5fPuPpaSvwElxHgGo7zYBBvOXVszN-pqWIQmDYUOg/exec"
-  );
+  const formUrl =
+    "https://script.google.com/macros/s/AKfycbzkaQ2HJOzjFGj1q03yJIdTq8DBQFrTndYp_Pfj6tVLz65ceCkDprQsKimXj0kIt4oMEw/exec";
+  const allAreas = ["使徒", "卓越", "青年", "飛鷹"];
   // 讀取資料：GET
   useEffect(() => {
     async function fetchData() {
@@ -73,8 +73,8 @@ function App() {
       : [];
 
   // checkbox 改變
-  const toggleName = (name) => {
-    setSelectedNames((prev) =>
+  const toggleName = (name: string) => {
+    setSelectedNames((prev: string[]) =>
       prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
     );
   };
@@ -123,7 +123,7 @@ function App() {
       <h1 style={{ textAlign: "center", marginBottom: 24, color: "#2c3e50" }}>
         1189回報表
       </h1>
-  
+
       {/* 牧區下拉 */}
       <div style={{ marginBottom: 24 }}>
         <label
@@ -136,6 +136,7 @@ function App() {
         >
           牧區：
         </label>
+        {/* 牧區選單 */}
         <select
           value={selectedArea}
           onChange={(e) => {
@@ -163,7 +164,7 @@ function App() {
           ))}
         </select>
       </div>
-  
+
       {/* 組別下拉 */}
       <div style={{ marginBottom: 24 }}>
         <label
@@ -206,8 +207,8 @@ function App() {
           ))}
         </select>
       </div>
-  
-      {/* checkbox 人名 */}
+
+      {/* checkbox 已完成第三梯次的組員： */}
       <div style={{ marginBottom: 24 }}>
         <label
           style={{
@@ -217,11 +218,10 @@ function App() {
             marginBottom: 8,
           }}
         >
-          人名：
+          已完成第三梯次的組員：
         </label>
         <div
           style={{
-            paddingLeft: 16,
             maxHeight: 200,
             overflowY: "auto",
             border: "1px solid #ddd",
@@ -287,7 +287,7 @@ function App() {
           ))}
         </div>
       </div>
-  
+
       {/* 訊息 */}
       <div style={{ marginBottom: 32 }}>
         <label
@@ -320,7 +320,7 @@ function App() {
           onBlur={(e) => (e.target.style.borderColor = "#ccc")}
         />
       </div>
-  
+
       <button
         onClick={handleSubmit}
         style={{
@@ -338,7 +338,8 @@ function App() {
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = "#2980b9";
-          e.currentTarget.style.boxShadow = "0 6px 12px rgba(41, 128, 185, 0.6)";
+          e.currentTarget.style.boxShadow =
+            "0 6px 12px rgba(41, 128, 185, 0.6)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = "#3498db";
@@ -349,7 +350,6 @@ function App() {
       </button>
     </div>
   );
-  
 }
 
 export default App;
