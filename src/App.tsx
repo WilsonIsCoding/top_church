@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import logo from "./assets/kvMain.webp";
 import BibleVerseLoader from "./components/BibleVerseLoader";
+import { toast } from "react-toastify";
 function App() {
   // 資料格式：[{區域, 組別, 姓名}]
   const [data, setData] = useState([]);
@@ -13,44 +14,6 @@ function App() {
 
   const formUrl =
     "https://script.google.com/macros/s/AKfycbyw9O7bP2EM_uU7D9EtJqcKjJxi91MQVaS3AjyJwAi9FT93HpTcCBb4w66LZBgnm-QWtA/exec";
-
-  // 讀取資料：GET
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch(formUrl);
-        const json = await res.json();
-        const converted = json
-          .map((item: any) => {
-            let area = "";
-            let group = "";
-            const people: string[] = [];
-
-            Object.values(item).forEach((value) => {
-              if (!value) return;
-              const strValue = String(value);
-              if (!area && /^[\u4e00-\u9fa5]+$/.test(strValue)) {
-                area = strValue;
-              } else if (!group) {
-                group = strValue;
-              } else {
-                people.push(String(value));
-              }
-            });
-
-            return people.map((name) => [area, group, name]);
-          })
-          .flat();
-
-        setData(converted);
-      } catch (error) {
-        console.error("讀取資料失敗", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
 
   // 取得所有牧區(區域)
   const areas = Array.from(new Set(data.map((d) => d[0])));
@@ -77,9 +40,47 @@ function App() {
     );
   };
 
-  const handleSubmit = async () => {
+  // 讀取資料：GET
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch(formUrl);
+        const json = await res.json();
+        const converted = json
+          .map((item: any) => {
+            let area = "";
+            let group = "";
+            const people: string[] = [];
 
-    setLoading(true); // 假設你用 React 的 state 來控制 loading 狀態
+            Object.values(item).forEach((value) => {
+              if (!value) return;
+              const strValue = String(value);
+
+              if (!area && /^[\u4e00-\u9fa5]+$/.test(strValue)) {
+                area = strValue;
+              } else if (!group) {
+                group = strValue;
+              } else if (people.length < 1) {
+                // ✅ 只抓一個人名（第三欄）
+                people.push(strValue);
+              }
+            });
+
+            return people.map((name) => [area, group, name]); // [['使徒', '2102', '丁曼娟']]
+          })
+          .flat();
+
+        setData(converted);
+      } catch (error) {
+        console.error("讀取資料失敗", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+  const handleSubmit = async () => {
+    setLoading(true);
 
     const payload = names.map((name) => ({
       area: selectedArea,
@@ -101,14 +102,27 @@ function App() {
         throw new Error(`HTTP error: ${res.status}`);
       }
 
-      const result = await res.json(); // 後端回傳 JSON 字串
-
-      const updatedCount = result.updated?.length || 0;
-      const addedCount = result.added?.length || 0;
-
-      alert(`✅ 成功送出！\n更新 ${updatedCount} 筆，新增 ${addedCount} 筆`);
+      await res.json(); // 後端回傳 JSON 字串
+      toast.success(`成功送出！`, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } catch (error) {
       console.error("送出失敗", error);
+      toast.error(` 送出失敗，請稍後再試`, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } finally {
       setLoading(false); // 無論成功失敗都要結束 loading
       setSelectedNames([]);

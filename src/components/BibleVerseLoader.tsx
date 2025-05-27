@@ -13,7 +13,7 @@ export default function BibleVerseLoader() {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % verses.length);
-    }, 1000); // 每 5 秒切換
+    }, 2000); // 每 2.5 秒切換
 
     return () => clearInterval(interval);
   }, []);
