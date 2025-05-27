@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-
+import logo from "./assets/kvMain.webp";
+import BibleVerseLoader from "./components/BibleVerseLoader";
 function App() {
   // 資料格式：[{區域, 組別, 姓名}]
   const [data, setData] = useState([]);
@@ -10,12 +11,9 @@ function App() {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
 
-  // 表單輸入資料
-  const formName = "1189回報表";
-  const [formMessage, setFormMessage] = useState("");
   const formUrl =
-    "https://script.google.com/macros/s/AKfycbzkaQ2HJOzjFGj1q03yJIdTq8DBQFrTndYp_Pfj6tVLz65ceCkDprQsKimXj0kIt4oMEw/exec";
-  const allAreas = ["使徒", "卓越", "青年", "飛鷹"];
+    "https://script.google.com/macros/s/AKfycbyw9O7bP2EM_uU7D9EtJqcKjJxi91MQVaS3AjyJwAi9FT93HpTcCBb4w66LZBgnm-QWtA/exec";
+
   // 讀取資料：GET
   useEffect(() => {
     async function fetchData() {
@@ -79,38 +77,51 @@ function App() {
     );
   };
 
-  // POST 送出
   const handleSubmit = async () => {
+
+    setLoading(true); // 假設你用 React 的 state 來控制 loading 狀態
+
     const payload = names.map((name) => ({
-      submitter: formName,
       area: selectedArea,
       group: selectedGroup,
       name,
-      status: selectedNames.includes(name) ? "v" : "x",
-      message: formMessage,
+      status: selectedNames.includes(name) ? true : false,
     }));
 
     try {
       const res = await fetch(formUrl, {
         method: "POST",
         headers: {
-          "Content-Type": "text/plain",
+          "Content-Type": "text/plain", // 注意：GAS 要接收 raw body，必須設為 text/plain
         },
         body: JSON.stringify(payload),
       });
-      console.log(res);
+
+      if (!res.ok) {
+        throw new Error(`HTTP error: ${res.status}`);
+      }
+
+      const result = await res.json(); // 後端回傳 JSON 字串
+
+      const updatedCount = result.updated?.length || 0;
+      const addedCount = result.added?.length || 0;
+
+      alert(`✅ 成功送出！\n更新 ${updatedCount} 筆，新增 ${addedCount} 筆`);
     } catch (error) {
-      console.error("送出資料失敗", error);
-      alert("資料已送出，請稍後確認。");
+      console.error("送出失敗", error);
+    } finally {
+      setLoading(false); // 無論成功失敗都要結束 loading
+      setSelectedNames([]);
+      setSelectedGroup("");
+      setSelectedArea("");
     }
   };
 
-  if (loading) return <div>讀取中...</div>;
+  if (loading) return <BibleVerseLoader />;
 
   return (
     <div
       style={{
-        padding: 24,
         maxWidth: 600,
         margin: "40px auto",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
@@ -120,9 +131,16 @@ function App() {
         color: "#333",
       }}
     >
-      <h1 style={{ textAlign: "center", marginBottom: 24, color: "#2c3e50" }}>
-        1189回報表
-      </h1>
+      <img
+        style={{
+          width: "100%",
+          height: "auto",
+          borderTopLeftRadius: "12px",
+          borderTopRightRadius: "12px",
+        }}
+        src={logo}
+        alt="logo"
+      />
 
       {/* 牧區下拉 */}
       <div style={{ marginBottom: 24 }}>
@@ -286,39 +304,6 @@ function App() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* 訊息 */}
-      <div style={{ marginBottom: 32 }}>
-        <label
-          style={{
-            fontWeight: "600",
-            fontSize: 16,
-            display: "block",
-            marginBottom: 8,
-          }}
-        >
-          備註：
-        </label>
-        <textarea
-          rows={3}
-          value={formMessage}
-          onChange={(e) => setFormMessage(e.target.value)}
-          placeholder="請輸入備註..."
-          style={{
-            width: "-webkit-fill-available",
-            padding: 12,
-            fontSize: 15,
-            borderRadius: 8,
-            border: "1px solid #ccc",
-            resize: "vertical",
-            outline: "none",
-            boxShadow: "inset 0 1px 4px rgba(0,0,0,0.1)",
-            transition: "border-color 0.3s",
-          }}
-          onFocus={(e) => (e.target.style.borderColor = "#3498db")}
-          onBlur={(e) => (e.target.style.borderColor = "#ccc")}
-        />
       </div>
 
       <button
