@@ -13,7 +13,7 @@ function App() {
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
 
   const formUrl =
-    "https://script.google.com/macros/s/AKfycbyw9O7bP2EM_uU7D9EtJqcKjJxi91MQVaS3AjyJwAi9FT93HpTcCBb4w66LZBgnm-QWtA/exec";
+    "https://script.google.com/macros/s/AKfycbxd4sNZNH5-zWcAElISiEJWCT7rei5bJk2pbkjSiI-1Z4zB4CCjKCN8qcd428D2HHwG3Q/exec";
 
   // 取得所有牧區(區域)
   const areas = Array.from(new Set(data.map((d) => d[0])));
