@@ -28,11 +28,11 @@ function App() {
 
             Object.values(item).forEach((value) => {
               if (!value) return;
-
-              if (!area && /^[\u4e00-\u9fa5]+$/.test(value)) {
-                area = value;
+              const strValue = String(value);
+              if (!area && /^[\u4e00-\u9fa5]+$/.test(strValue)) {
+                area = strValue;
               } else if (!group) {
-                group = String(value);
+                group = strValue;
               } else {
                 people.push(String(value));
               }
