@@ -136,8 +136,9 @@ function App() {
   return (
     <div
       style={{
+        height: "100vh",
+        padding: 10,
         maxWidth: 600,
-        margin: "40px auto",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         backgroundColor: "#f9f9f9",
         borderRadius: 12,
@@ -177,6 +178,8 @@ function App() {
             setSelectedNames([]);
           }}
           style={{
+            backgroundColor: "white",
+            color: "black",
             width: "100%",
             padding: "10px 12px",
             fontSize: 16,
@@ -323,6 +326,7 @@ function App() {
       <button
         onClick={handleSubmit}
         style={{
+          maxWidth: "none",
           width: "100%",
           padding: "14px 0",
           fontSize: 18,
