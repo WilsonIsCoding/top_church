@@ -152,9 +152,13 @@ function App() {
           height: "auto",
           borderTopLeftRadius: "12px",
           borderTopRightRadius: "12px",
+          cursor: "pointer",
         }}
         src={logo}
         alt="logo"
+        onClick={() => {
+          window.open("https://www.topchurch.net/", "_blank");
+        }}
       />
 
       {/* 牧區下拉 */}
