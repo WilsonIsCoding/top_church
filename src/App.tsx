@@ -155,7 +155,7 @@ function App() {
           cursor: "pointer",
         }}
         src={logo}
-        alt="logo"
+        alt="新店行道會"
         onClick={() => {
           window.open("https://www.topchurch.net/", "_blank");
         }}
