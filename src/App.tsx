@@ -11,7 +11,7 @@ function App() {
   const [selectedArea, setSelectedArea] = useState("");
   const [selectedGroup, setSelectedGroup] = useState("");
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
-
+  const [formMessage, setFormMessage] = useState("");
   const formUrl =
     "https://script.google.com/macros/s/AKfycbxd4sNZNH5-zWcAElISiEJWCT7rei5bJk2pbkjSiI-1Z4zB4CCjKCN8qcd428D2HHwG3Q/exec";
 
@@ -87,6 +87,7 @@ function App() {
       group: selectedGroup,
       name,
       status: selectedNames.includes(name) ? true : false,
+      message: formMessage,
     }));
 
     try {
@@ -136,7 +137,6 @@ function App() {
   return (
     <div
       style={{
-        height: "100vh",
         padding: 10,
         maxWidth: 600,
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
@@ -325,6 +325,39 @@ function App() {
             </div>
           ))}
         </div>
+      </div>
+        {/* 訊息 */}
+        <div style={{ marginBottom: 32 }}>
+        <label
+          style={{
+            fontWeight: "600",
+            fontSize: 16,
+            display: "block",
+            marginBottom: 8,
+          }}
+        >
+          備註：
+        </label>
+        <textarea
+          rows={3}
+          value={formMessage}
+          onChange={(e) => setFormMessage(e.target.value)}
+          placeholder="請輸入備註..."
+          style={{
+            backgroundColor: "white",
+            width: "-webkit-fill-available",
+            padding: 12,
+            fontSize: 15,
+            borderRadius: 8,
+            border: "1px solid #ccc",
+            resize: "vertical",
+            outline: "none",
+            boxShadow: "inset 0 1px 4px rgba(0,0,0,0.1)",
+            transition: "border-color 0.3s",
+          }}
+          onFocus={(e) => (e.target.style.borderColor = "#3498db")}
+          onBlur={(e) => (e.target.style.borderColor = "#ccc")}
+        />
       </div>
 
       <button
