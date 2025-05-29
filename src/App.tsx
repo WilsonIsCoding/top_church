@@ -13,7 +13,7 @@ function App() {
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
   const [formMessage, setFormMessage] = useState("");
   const formUrl =
-    "https://script.google.com/macros/s/AKfycbxd4sNZNH5-zWcAElISiEJWCT7rei5bJk2pbkjSiI-1Z4zB4CCjKCN8qcd428D2HHwG3Q/exec";
+    "https://script.google.com/macros/s/AKfycbxNoiJIeJfUd4gfJSy6D5yfKk7g8Ve4TWmm2F46EoW9XeC7Y4Hu_cKmVEIFttv7MVA-/exec";
 
   // 取得所有牧區(區域)
   const areas = Array.from(new Set(data.map((d) => d[0])));
@@ -345,6 +345,7 @@ function App() {
           placeholder="請輸入備註..."
           style={{
             backgroundColor: "white",
+            color: "black",
             width: "-webkit-fill-available",
             padding: 12,
             fontSize: 15,
