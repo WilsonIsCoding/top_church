@@ -6,14 +6,14 @@ function App() {
   // 資料格式：[{區域, 組別, 姓名}]
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [allUnselected, setAllUnselected] = useState(false);
   // 選擇狀態
   const [selectedArea, setSelectedArea] = useState("");
   const [selectedGroup, setSelectedGroup] = useState("");
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
   const [formMessage, setFormMessage] = useState("");
   const formUrl =
-    "https://script.google.com/macros/s/AKfycbxNoiJIeJfUd4gfJSy6D5yfKk7g8Ve4TWmm2F46EoW9XeC7Y4Hu_cKmVEIFttv7MVA-/exec";
+    "https://script.google.com/macros/s/AKfycbyTCYpIzP0F42B-UdwlVX8vfQgxhshvnNRNsVLnZCZFUWm4xrD6wMBroJjWhLZMACn4/exec";
 
   // 取得所有牧區(區域)
   const areas = Array.from(new Set(data.map((d) => d[0])));
@@ -47,7 +47,7 @@ function App() {
         const res = await fetch(formUrl);
         const json = await res.json();
         const converted = json
-          .map((item: any) => {
+          .map((item: { [key: string]: string }) => {
             let area = "";
             let group = "";
             const people: string[] = [];
@@ -299,7 +299,7 @@ function App() {
                   }}
                   style={{ marginRight: 8, cursor: "pointer" }}
                 />
-                全選
+                全組完成
               </label>
             </div>
           )}
@@ -318,17 +318,44 @@ function App() {
                 <input
                   type="checkbox"
                   checked={selectedNames.includes(name)}
-                  onChange={() => toggleName(name)}
+                  onChange={() => {
+                    if (allUnselected) {
+                      setAllUnselected(false);
+                    }
+                    toggleName(name);
+                  }}
                   style={{ cursor: "pointer" }}
                 />
                 {name}
               </label>
             </div>
           ))}
+          {/* 全組都不完成 */}
+          {names.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+          <label
+            style={{ fontWeight: "600", cursor: "pointer", userSelect: "none" }}
+          >
+            <input
+              type="checkbox"
+              checked={allUnselected}
+              onChange={() => {
+                const nextValue = !allUnselected;
+                setAllUnselected(nextValue);
+                if (nextValue) {
+                  setSelectedNames([]); // 勾選「全組不完成」就清空選取
+                }
+              }}
+              style={{ marginRight: 8, cursor: "pointer" }}
+            />
+            全組未完成
+          </label>
+          </div>
+          )}
         </div>
       </div>
-        {/* 訊息 */}
-        <div style={{ marginBottom: 32 }}>
+      {/* 訊息 */}
+      <div style={{ marginBottom: 32 }}>
         <label
           style={{
             fontWeight: "600",
