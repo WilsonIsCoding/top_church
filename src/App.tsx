@@ -7,6 +7,7 @@ function App() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [allUnselected, setAllUnselected] = useState(false);
+  
   // 選擇狀態
   const [selectedArea, setSelectedArea] = useState("");
   const [selectedGroup, setSelectedGroup] = useState("");
