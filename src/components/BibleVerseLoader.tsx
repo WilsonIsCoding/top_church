@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const verses = [
-  "凡事都有定期，天下萬務都有定時。 — 傳道書 3:1",
-  "你要專心仰賴耶和華，不可倚靠自己的聰明。 — 箴言 3:5",
-  "耶和華是我的牧者，我必不致缺乏。 — 詩篇 23:1",
-];
-
-export default function BibleVerseLoader() {
+export default function BibleVerseLoader({ verses }: { verses: string[] }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -16,7 +10,7 @@ export default function BibleVerseLoader() {
     }, 2000); // 每 2 秒切換
 
     return () => clearInterval(interval);
-  }, []);
+  }, [verses]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-white z-50">

@@ -1,5 +1,5 @@
-import  { useEffect, useState } from "react";
-
+import { useEffect, useState } from "react";
+import BibleVerseLoader from "../components/BibleVerseLoader";
 type Person = {
   uid: string;
   name: string;
@@ -16,19 +16,15 @@ type Activity = {
 
 export default function PaymentSearch() {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   // 紀錄已標記繳費的uid集合
   const [paidUids, setPaidUids] = useState<Set<string>>(new Set());
   // 紀錄正在送出的uid集合（loading狀態）
   const [loadingUids, setLoadingUids] = useState<Set<string>>(new Set());
-    const formUrl =
+  const verses = ["初次載入，請稍等..."];
+  const formUrl =
     "https://script.google.com/macros/s/AKfycbyuKNxAbv8Yi_X4xQaK3uQy9AdP_c1WVJoEMXaAiWk0R__HmW3hLh3iK0yWn9Z3QiKg/exec";
-  useEffect(() => {
-    fetch(formUrl)
-      .then((res) => res.json())
-      .then(setActivities)
-      .catch((err) => console.error("載入失敗", err));
-  }, []);
 
   const filtered = activities.flatMap((activity) =>
     activity.data
@@ -44,23 +40,21 @@ export default function PaymentSearch() {
         activityId: activity.activityId,
       }))
   );
-
   async function markAsPaid(person: Person & { activityName: string }) {
     if (loadingUids.has(person.uid) || paidUids.has(person.uid)) return;
 
     setLoadingUids((prev) => new Set(prev).add(person.uid));
     try {
       const res = await fetch(formUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain",
-          },
-          body: JSON.stringify({
-            activityName: person.activityName,
-            name: person.name,
-          }),
-            }
-      );
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: JSON.stringify({
+          activityName: person.activityName,
+          name: person.name,
+        }),
+      });
       const data = await res.json();
       if (res.status === 200) {
         setPaidUids((prev) => new Set(prev).add(person.uid));
@@ -70,7 +64,7 @@ export default function PaymentSearch() {
       }
     } catch (error) {
       alert("網路錯誤：" + error);
-    }finally{
+    } finally {
       setLoadingUids((prev) => {
         const copy = new Set(prev);
         copy.delete(person.uid);
@@ -78,6 +72,16 @@ export default function PaymentSearch() {
       });
     }
   }
+
+  useEffect(() => {
+    fetch(formUrl)
+      .then((res) => res.json())
+      .then(setActivities)
+      .catch((err) => console.error("載入失敗", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <BibleVerseLoader verses={verses} />;
 
   return (
     <div className="max-w-xl mx-auto p-4">
@@ -93,13 +97,16 @@ export default function PaymentSearch() {
       <div className="min-h-[120px] space-y-2">
         {filtered.map((person) => (
           <div
-            key={`${person.uid || person.phone || person.name}_${person.activityId || ''}`}
+            key={`${person.uid || person.phone || person.name}_${
+              person.activityId || ""
+            }`}
             className="flex justify-between items-center p-3 border rounded-lg bg-white shadow-sm hover:shadow-md transition"
           >
             <div>
               <p className="font-medium text-gray-900">{person.name}</p>
               <p className="text-sm text-gray-500">
-                📱 {person.phone} ｜ 🏷️ {person.team} ｜ 📘 {person.activityName}
+                📱 {person.phone} ｜ 🏷️ {person.team} ｜ 📘{" "}
+                {person.activityName}
               </p>
             </div>
             <button

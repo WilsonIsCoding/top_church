@@ -7,7 +7,7 @@ export default function TopChurch() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [allUnselected, setAllUnselected] = useState(false);
-  
+
   // 選擇狀態
   const [selectedArea, setSelectedArea] = useState("");
   const [selectedGroup, setSelectedGroup] = useState("");
@@ -15,7 +15,11 @@ export default function TopChurch() {
   const [formMessage, setFormMessage] = useState("");
   const formUrl =
     "https://script.google.com/macros/s/AKfycbxfqI5p38pJLX8Cou-HOCCcA7LMH_x3Y2oxa0fuM-Ve2C3yYEf9y8hh9X5SvqSm07pf/exec";
-
+  const verses = [
+    "凡事都有定期，天下萬務都有定時。 — 傳道書 3:1",
+    "你要專心仰賴耶和華，不可倚靠自己的聰明。 — 箴言 3:5",
+    "耶和華是我的牧者，我必不致缺乏。 — 詩篇 23:1",
+  ];
   // 取得所有牧區(區域)
   const areas = Array.from(new Set(data.map((d) => d[0])));
 
@@ -40,49 +44,8 @@ export default function TopChurch() {
       prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
     );
   };
-
-  // 讀取資料：GET
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch(formUrl);
-        const json = await res.json();
-        const converted = json
-          .map((item: { [key: string]: string }) => {
-            let area = "";
-            let group = "";
-            const people: string[] = [];
-
-            Object.values(item).forEach((value) => {
-              if (!value) return;
-              const strValue = String(value);
-
-              if (!area && /^[\u4e00-\u9fa5]+$/.test(strValue)) {
-                area = strValue;
-              } else if (!group) {
-                group = strValue;
-              } else if (people.length < 1) {
-                // ✅ 只抓一個人名（第三欄）
-                people.push(strValue);
-              }
-            });
-
-            return people.map((name) => [area, group, name]); // [['使徒', '2102', '丁曼娟']]
-          })
-          .flat();
-
-        setData(converted);
-      } catch (error) {
-        console.error("讀取資料失敗", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
   const handleSubmit = async () => {
     setLoading(true);
-
     const payload = names.map((name) => ({
       area: selectedArea,
       group: selectedGroup,
@@ -133,8 +96,47 @@ export default function TopChurch() {
       setFormMessage("");
     }
   };
+  // 讀取資料：GET
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch(formUrl);
+        const json = await res.json();
+        const converted = json
+          .map((item: { [key: string]: string }) => {
+            let area = "";
+            let group = "";
+            const people: string[] = [];
 
-  if (loading) return <BibleVerseLoader />;
+            Object.values(item).forEach((value) => {
+              if (!value) return;
+              const strValue = String(value);
+
+              if (!area && /^[\u4e00-\u9fa5]+$/.test(strValue)) {
+                area = strValue;
+              } else if (!group) {
+                group = strValue;
+              } else if (people.length < 1) {
+                // ✅ 只抓一個人名（第三欄）
+                people.push(strValue);
+              }
+            });
+
+            return people.map((name) => [area, group, name]); // [['使徒', '2102', '丁曼娟']]
+          })
+          .flat();
+
+        setData(converted);
+      } catch (error) {
+        console.error("讀取資料失敗", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) return <BibleVerseLoader verses={verses} />;
 
   return (
     <div
@@ -334,24 +336,28 @@ export default function TopChurch() {
           {/* 全組都不完成 */}
           {names.length > 0 && (
             <div style={{ marginBottom: 12 }}>
-          <label
-            style={{ fontWeight: "600", cursor: "pointer", userSelect: "none" }}
-          >
-            <input
-              type="checkbox"
-              checked={allUnselected}
-              onChange={() => {
-                const nextValue = !allUnselected;
-                setAllUnselected(nextValue);
-                if (nextValue) {
-                  setSelectedNames([]); // 勾選「全組不完成」就清空選取
-                }
-              }}
-              style={{ marginRight: 8, cursor: "pointer" }}
-            />
-            全組未完成
-          </label>
-          </div>
+              <label
+                style={{
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  userSelect: "none",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={allUnselected}
+                  onChange={() => {
+                    const nextValue = !allUnselected;
+                    setAllUnselected(nextValue);
+                    if (nextValue) {
+                      setSelectedNames([]); // 勾選「全組不完成」就清空選取
+                    }
+                  }}
+                  style={{ marginRight: 8, cursor: "pointer" }}
+                />
+                全組未完成
+              </label>
+            </div>
           )}
         </div>
       </div>
