@@ -1,88 +1,133 @@
-// App.tsx or Payment.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
 
-const DATA_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLiCqR2KZx5iTfK0WpnZ12ROGLavXxJ5CmTEozAfGzUhz4r3LskRPmYjm6ddHFDqOfysnohcO64KBu_s8WdJLggylUauzv7_UXuIpx_6GgbQ7rjBWqQLM_VSObBpfPeodz-Bj4_ubIGSx24YYZQt5NFA32WQWOOtoEezcouGWIeB0MgWwdFgHRs-T2wTs2MJV56iMfbOfTsP_-oYnIsZGmPsor9EVgWnkv35zX5IgORW90B0QskBvXxB3OInOjX5jei2H3UgSbt_s1Gnzqos8G0Cto00vw&lib=MIQziLwT1MCXZr6Qq9BcMmcyyKctprk1A";
+type Person = {
+  uid: string;
+  name: string;
+  phone: string;
+  group: string;
+  team: string;
+};
 
-function Payment() {
-  const [input, setInput] = useState('');
-  const [rawData, setRawData] = useState([]);
-  const [results, setResults] = useState([]);
+type Activity = {
+  activityName: string;
+  activityId: string;
+  data: Person[];
+};
 
+export default function PaymentSearch() {
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [query, setQuery] = useState("");
+  // 紀錄已標記繳費的uid集合
+  const [paidUids, setPaidUids] = useState<Set<string>>(new Set());
+  // 紀錄正在送出的uid集合（loading狀態）
+  const [loadingUids, setLoadingUids] = useState<Set<string>>(new Set());
+    const formUrl =
+    "https://script.google.com/macros/s/AKfycbyuKNxAbv8Yi_X4xQaK3uQy9AdP_c1WVJoEMXaAiWk0R__HmW3hLh3iK0yWn9Z3QiKg/exec";
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(DATA_URL);
-        const json = await res.json();
-        setRawData(json);
-        console.log(json);
-      } catch (err) {
-        console.error("資料載入失敗", err);
-      }
-    };
-    fetchData();
+    fetch(formUrl)
+      .then((res) => res.json())
+      .then(setActivities)
+      .catch((err) => console.error("載入失敗", err));
   }, []);
 
-  const handleSearch = (value: string) => {
-    setInput(value);
+  const filtered = activities.flatMap((activity) =>
+    activity.data
+      .filter(
+        (person) =>
+          person.name.includes(query) ||
+          person.phone.includes(query) ||
+          person.team.includes(query)
+      )
+      .map((person) => ({
+        ...person,
+        activityName: activity.activityName,
+        activityId: activity.activityId,
+      }))
+  );
 
-    const keyword = value.trim().toLowerCase();
-    if (!keyword) {
-      setResults([]);
-      return;
-    }
+  async function markAsPaid(person: Person & { activityName: string }) {
+    if (loadingUids.has(person.uid) || paidUids.has(person.uid)) return;
 
-    const matched = [];
-
-    for (const activity of rawData) {
-      const matchedUsers = activity.data.filter(user =>
-        user.name?.toLowerCase().includes(keyword) ||
-        user.phone?.includes(keyword) ||
-        user.team?.toLowerCase().includes(keyword)
+    setLoadingUids((prev) => new Set(prev).add(person.uid));
+    try {
+      const res = await fetch(formUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+          body: JSON.stringify({
+            activityName: person.activityName,
+            name: person.name,
+          }),
+            }
       );
-
-      if (matchedUsers.length > 0) {
-        matched.push({
-          activityName: activity.activityName,
-          activityId: activity.activityId,
-          users: matchedUsers
-        });
+      const data = await res.json();
+      if (res.status === 200) {
+        setPaidUids((prev) => new Set(prev).add(person.uid));
+        alert(data.message);
+      } else {
+        alert("繳費失敗：" + data.message);
       }
+    } catch (error) {
+      alert("網路錯誤：" + error);
+    }finally{
+      setLoadingUids((prev) => {
+        const copy = new Set(prev);
+        copy.delete(person.uid);
+        return copy;
+      });
     }
-
-    setResults(matched);
-  };
+  }
 
   return (
-    <div className="p-4 font-sans">
-      <h2>學員課程查詢</h2>
+    <div className="max-w-xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">繳費查詢</h1>
       <input
         type="text"
-        placeholder="請輸入姓名、電話或小組"
-        value={input}
-        onChange={(e) => handleSearch(e.target.value)}
-        style={{ padding: '0.5rem', width: '300px', fontSize: '1rem' }}
+        className="w-full p-3 border border-gray-400 rounded-lg mb-4 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500"
+        placeholder="輸入姓名、電話或小組"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
 
-      {results.length > 0 ? (
-        <div style={{ marginTop: '2rem' }}>
-          {results.map((entry, i) => (
-            <div key={i} style={{ marginBottom: '1.5rem' }}>
-              <strong>活動：</strong> {entry.activityName}（ID: {entry.activityId}）
-              <ul>
-                {entry.users.map((user, j) => (
-                  <li key={j}>
-                    {user.name} | {user.phone} | 小組：{user.team}
-                  </li>
-                ))}
-              </ul>
+      <div className="min-h-[120px] space-y-2">
+        {filtered.map((person) => (
+          <div
+            key={`${person.uid || person.phone || person.name}_${person.activityId || ''}`}
+            className="flex justify-between items-center p-3 border rounded-lg bg-white shadow-sm hover:shadow-md transition"
+          >
+            <div>
+              <p className="font-medium text-gray-900">{person.name}</p>
+              <p className="text-sm text-gray-500">
+                📱 {person.phone} ｜ 🏷️ {person.team} ｜ 📘 {person.activityName}
+              </p>
             </div>
-          ))}
-        </div>
-      ) : input ? (
-        <p style={{ marginTop: '2rem' }}>找不到符合的學員</p>
-      ) : null}
+            <button
+              onClick={() => markAsPaid(person)}
+              disabled={paidUids.has(person.uid) || loadingUids.has(person.uid)}
+              className={`px-4 py-1 rounded-lg text-sm transition
+                ${
+                  paidUids.has(person.uid)
+                    ? "bg-green-500 text-white cursor-default"
+                    : loadingUids.has(person.uid)
+                    ? "bg-gray-400 text-white cursor-wait"
+                    : "bg-purple-500 text-white hover:bg-purple-600"
+                }
+              `}
+            >
+              {paidUids.has(person.uid)
+                ? "已繳費"
+                : loadingUids.has(person.uid)
+                ? "處理中..."
+                : "標記已繳費"}
+            </button>
+          </div>
+        ))}
+
+        {filtered.length === 0 && query && (
+          <p className="text-gray-500 text-center">查無符合資料</p>
+        )}
+      </div>
     </div>
   );
 }
-
-export default Payment;

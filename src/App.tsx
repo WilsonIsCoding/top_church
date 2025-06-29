@@ -4,7 +4,7 @@ import Payment from "./pages/payment";
 
 function App() {
   return (
-    <div>
+    <div  className="min-h-screen bg-white">
       <BrowserRouter>
         <Routes>
         <Route path="/top-church" element={<TopChurch />} />
