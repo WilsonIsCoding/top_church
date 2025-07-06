@@ -6,6 +6,7 @@ type Person = {
   phone: string;
   group: string;
   team: string;
+  activityPrice: number;
   已繳費?: string; // 新增 "已繳費" 欄位
 };
 
@@ -181,7 +182,7 @@ export default function PaymentSearch() {
                 <thead>
                   <tr>
                     {/* 渲染 selectedPerson 的資料 */}
-                    {Object.entries(selectedPerson).map(([key, value]) => {
+                    {Object.entries(selectedPerson).map(([key]) => {
                       const formattedValue =
                         key && !isNaN(Date.parse(key)) ? formatDate(key) : key;
                       return (
@@ -198,7 +199,7 @@ export default function PaymentSearch() {
                     {Object.entries(selectedPerson).map(([key, value]) => {
                       return (
                         <td key={`td-${key}`} className="px-4 py-2 border">
-                          {value || ""}
+                          {JSON.stringify(value) || ""}
                         </td>
                       );
                     })}
