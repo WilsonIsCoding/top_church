@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import BibleVerseLoader from "../components/BibleVerseLoader";
 type Person = {
   uid: string;
@@ -108,6 +109,10 @@ export default function PaymentSearch() {
   if (submitting) return <BibleVerseLoader verses={submittingVerses} />;
 
   return (
+    <>
+    <Helmet>
+      <title>學員名單表</title>
+    </Helmet>
     <div className="max-w-xl mx-auto p-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold mb-4 text-gray-800">學員資料查詢</h1>
@@ -227,8 +232,9 @@ export default function PaymentSearch() {
                 : "標記為已繳費"}
             </button>
           </div>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
