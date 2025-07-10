@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import TopChurch from "./pages/topChurch";
-import Payment from "./pages/payment";
+import Submit from "./pages/submit";
+import TopChurch from "./pages/top-church";
+import Habits from "./pages/habits";
 
 function App() {
   return (
@@ -8,7 +9,8 @@ function App() {
       <BrowserRouter>
         <Routes>
         <Route path="/top-church" element={<TopChurch />} />
-        <Route path="/payment" element={<Payment />} />
+        <Route path="/habits" element={<Habits />} />
+        <Route path="/submit" element={<Submit />} />
         </Routes>
       </BrowserRouter>
     </div>
