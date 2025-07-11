@@ -127,12 +127,12 @@ export default function PaymentSearch() {
   return (
     <>
       <Helmet>
-        <title>報名與繳費記錄查詢</title>
+        <title>Top Church 報名與繳費記錄查詢</title>
       </Helmet>
       <div className="max-w-xl mx-auto p-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
-          報名與繳費記錄查詢
+          Top Church 報名與繳費記錄查詢
           </h1>
           <select
             className="w-1/3 p-3 border border-gray-400 rounded-lg mb-4 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500"
