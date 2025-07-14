@@ -43,7 +43,7 @@ export default function PaymentSearch() {
 
   // 經手人配置
   const hadlerConfig = [
-    "請選擇經手人",
+    "請選經手人",
     "又藺",
     "璧瑄",
     "若望",
