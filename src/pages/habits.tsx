@@ -59,7 +59,6 @@ export default function PaymentSearch() {
         (person) =>
           person.name.includes(query) ||
           person.phone.includes(query) ||
-          person.team.includes(query) ||
           activity.activityName.includes(query)
       )
       .map((person) => ({
