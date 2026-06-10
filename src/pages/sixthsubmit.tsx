@@ -153,10 +153,17 @@ export default function AttendanceApp() {
     let done = 0;
     let total = 0;
     for (const p of people) {
+      const registeredForSpecial =
+        p.sessions[4] === ATTENDANCE_STATUS.CHECKED ||
+        p.sessions[4] === ATTENDANCE_STATUS.CROSSED;
       for (const s of [4, 5, 6]) {
         const status = p.sessions[s];
         const isPending = !!pendingChecks[`${p.name}_${s}`];
-        if (!status || status === ATTENDANCE_STATUS.NOT_REGISTERED) continue;
+        const inScope =
+          status === ATTENDANCE_STATUS.CHECKED ||
+          status === ATTENDANCE_STATUS.CROSSED ||
+          (s !== 4 && registeredForSpecial);
+        if (!inScope) continue;
         total++;
         if (status === ATTENDANCE_STATUS.CHECKED || isPending) done++;
       }
