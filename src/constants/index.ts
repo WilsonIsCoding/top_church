@@ -4,7 +4,7 @@ export const API_ENDPOINTS = {
   HABITS:
     "https://script.google.com/macros/s/AKfycbxWdpuLM5VSCFJlo5hW27t6silbjwuwOP1jSDY-xexw8tsYLjCgaB-CM8cVDR8sVWwU/exec",
   SUBMIT:
-    "https://script.google.com/macros/s/AKfycbzmQ7dcz_wT0O70HKI5WFZnrV_viVziy0Rrlq7J51FSwbwBt9mYI1V0C2URcOhCe3xZ_w/exec",
+    "https://script.google.com/macros/s/AKfycbzmsctZs4HweHjFgWrPKkFwa-FFTpXbJFOhsDvQk0cI4tmSpdyXX99xGPg8YCDx-MSlvQ/exec",
   SIXTH_SUBMIT:
     "https://script.google.com/macros/s/AKfycbz46nBNRh2ytX63xYT7LkblYCITjRFNC1_VctDPW8RNbXaoXDiVUQO3-wKixLFNy_9iLg/exec",
   LEADERBOARD:
